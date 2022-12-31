@@ -81,30 +81,61 @@ class FlightMap:
         props.id = id
     
     def import_airports(csv_file : str):
-        csv_file___ = csv.reader(open(csv_file, "r"), delimiter=",")
-        return csv_file___
+        csv_file = "/home/ds/Documents/ESTIAM/PROJETS/TP - Vols avec-sans correspondances/aeroports.csv"
+        return csv_file
         
     def import_flights(csv_file : str):
-        print('rerere')
+        csv_file = "/home/ds/Documents/ESTIAM/PROJETS/TP - Vols avec-sans correspondances/flights.csv"
+        return csv_file
         
     def airport_find(airport_code):
-        print("cherche l'aéroport qui correspond au code")
-        list_search = list()
-        for row in FlightMap.import_airports('/home/ds/Documents/ESTIAM/PROJETS/TP - Vols avec-sans correspondances/aeroports.csv'):
-            list_search.append({'NAME': row[0], 'CODE AIRPORT': row[1]})
-        if len(list_search) < 1:
-            print(list_search) 
-        else:
-            print('None')
-            
+        with open(FlightMap.import_airports('0')) as file_obj:
+            reader_obj = csv.reader(file_obj)
+            for row in reader_obj:
+                try:
+                    if airport_code in row[1]:
+                        value =  str(row[0]) + '   |    '+ str(row[1])+'  |    '+ str(row[2]) + ' |\n'
+                        return value
+                except FlightPathBroken:
+                    continue
+
         
-    def flight_exist(src_airport_code: str, dst_airport_code: str) : bool
-    
+    def flight_exist(src_airport_code: str, dst_airport_code: str):
+        with open(FlightMap.import_flights('0')) as file_obj:
+            reader_obj = csv.reader(file_obj)
+            for row in reader_obj:
+                try:
+                    if src_airport_code in row[0] and dst_airport_code in row[1] and "1.0" in str(row[2]):
+                        return True
+                except FlightPathBroken:
+                    continue
+                
     def flights_where(airport_code: str):
+        value = ''
         print("Cette méthode cherche les vols directs qui concernent l'aéroport airport_code, et retourne la liste des vols concernés")
+        with open(FlightMap.import_flights('0')) as file_obj:
+            reader_obj = csv.reader(file_obj)
+            for row in reader_obj:
+                try:
+                    if airport_code in row[0] and "1.0" in str(row[2]):
+                        value += '\n'+('-'*40)
+                        value +=  str(row[0]) + '   |    '+ str(row[1])+'  |    '+ str(row[2]) + ' |\n'
+                except FlightPathBroken:
+                    continue
+        return value
         
     def airports_from(airport_code: str):
+        value = ''
         print("Retourne la liste des aéroports destinations des vols en partance de l'aéroport airport_code (plutôt que les vols eux-mêmes).")
+        with open(FlightMap.import_flights('0')) as file_obj:
+            reader_obj = csv.reader(file_obj)
+            for row in reader_obj:
+                try:
+                    if airport_code in row[0]:
+                        return FlightMap.airport_find(row[1])
+                except FlightPathBroken:
+                    continue
+        return value
 
 class FlightPathBroken(Exception):
     def __init__(self, message, errors):
@@ -155,21 +186,28 @@ if __name__ == "__main__":
         elif ans=="3":
             airport_code = str(input("\n Entrer le code de l'aéroport "))
             print("\n"+ airport_code +"\n")
-            airport_code = FlightMap.airport_find(airport_code)
-            airport_code()
+            result = FlightMap.airport_find(airport_code)
+            print(result)
             print("\n--------------------------------------------------\n")
         elif ans=="4":
-            print("\n Goodbye") 
-            ans = None
+            src_airport_code = str(input("\n Entrer le code de src_airport_code l'aéroport  ex: FRA "))
+            dst_airport_code = str(input("\n Entrer le code de dst_airport_code l'aéroport   ex: AMS "))
+            result = FlightMap.flight_exist(src_airport_code,dst_airport_code)
+            print(result)
             print("\n--------------------------------------------------\n")
         elif ans=="5":
-            print("\n Student Record Found")
+            
+            airport_code = str(input("\n Entrer le code de l'aéroport "))
+            result = FlightMap.flights_where(airport_code)
+            print(result)
             print("\n--------------------------------------------------\n")
         elif ans=="6":
-            print("\n Student Record Found")
+            airport_code = str(input("\n Entrer le code de l'aéroport "))
+            result = FlightMap.flights_where(airport_code)
+            print(result)
             print("\n--------------------------------------------------\n")
         elif ans=="7":
-            print("\n Student Record Found")
-            print("\n--------------------------------------------------\n")
+            ans = None
+            break
         else:
             print("\n Not Valid Choice Try again")
